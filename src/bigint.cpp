@@ -26,14 +26,23 @@ byte_t bigint::get_digit(cell_t index) {
 
 byte_t bigint::set_digit(cell_t index, cell_t value) {
     cell_t ret_val = STATUS_OK;
-
-    if (index >= cells.size() * DIGITS_PER_CELL) { // If exceeds bounds, create new cell and add digit to it
+    if (value < 0 || value > 9) return ERROR_INVALID_DIGIT;
+    else if (index >= cells.size() * DIGITS_PER_CELL) { // If exceeds bounds, create new cell and add digit to it
         ret_val = STATUS_NEW_CELL_CREATED;
         if (value >= 0 && value <= 9) {
-            cells.push_front(value)
-        }
-        else {
-            return ERROR_INVALID_DIGIT;
+            cells.push_front(value);
         }
     }
+    else {
+        cell_t cellNum = index / DIGITS_PER_CELL;
+        cell_t digitShift = (index % DIGITS_PER_CELL) * DIGIT_BIT_SIZE;
+        cell_t bitmask = 0xf;
+        bitmask = bitmask << digitShift;
+        bitmask = ~bitmask // Not it so that we can clear the current bit spot
+        cell_t digit = cells[cellNum] & bitmask;
+        bitmask = ~bitmask;
+        digit = digit | (value << digitShift);
+        cells[cellNum] = digit;
+    }
+    return ret_val;
 }

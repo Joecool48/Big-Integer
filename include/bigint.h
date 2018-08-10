@@ -14,7 +14,7 @@ class bigint {
         ERROR_OUT_OF_BOUNDS,
         ERROR_INVALID_DIGIT,
         STATUS_OK,
-        STATUS_NEW_CELL_CREATED,
+        STATUS_NEW_CELL_CREATED
 
     }
     const static int CELL_BIT_SIZE = 64;
