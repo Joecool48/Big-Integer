@@ -1,13 +1,15 @@
 #include <stdio.h>
-#include <stdint>
+#include <stdint.h>
 #include <stdlib.h>
 #include <iostream>
 #include <vector>
 
-
+#ifndef BIGINT_H
+#define BIGINT_H
+typedef uint64_t cell_t;
+typedef char byte_t;
 class bigint {
-    typedef uint64_t cell_t;
-    typedef char byte_t;
+
     std::vector<cell_t> *cells;
     enum STATUS {
         ERROR = -127,
@@ -16,7 +18,7 @@ class bigint {
         STATUS_OK,
         STATUS_NEW_CELL_CREATED
 
-    }
+    };
     const static int CELL_BIT_SIZE = 64;
     const static int DIGIT_BIT_SIZE = 4;
     const static int DIGITS_PER_CELL = 16;
@@ -29,8 +31,9 @@ class bigint {
     bigint operator /(bigint &other);
     bigint operator %(bigint &other);
 
-    byte_t shift_cells(int amount);
-
     byte_t get_digit(cell_t index);
-    byte_t set_digit(cell_t index);
+    byte_t set_digit(cell_t index, cell_t value);
+    void printDigits();
 };
+
+#endif /*BIGINT_H*/
