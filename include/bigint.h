@@ -30,12 +30,12 @@ public:
     cell_t m_maxSetIndex;
     bigint();
     bigint(long value);
-    bigint operator +(const bigint &other) const;
-    bigint operator -(const bigint &other);
-    bigint operator *(const bigint &other);
-    bigint operator /(const bigint &other);
-    bigint operator %(const bigint &other);
-    bigint operator =(const bigint &other) const;
+    bigint operator +(bigint const &other) const;
+    bigint operator -(bigint const &other) const;
+    bigint operator *(bigint const &other) const;
+    bigint operator /(bigint const &other) const;
+    bigint operator %(bigint const &other) const;
+    bigint operator =(bigint const &other) const;
     byte_t get_digit(cell_t index) const;
     byte_t set_digit(cell_t index, cell_t value);
     void printDigits() const;
