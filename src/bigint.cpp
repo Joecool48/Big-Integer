@@ -40,24 +40,26 @@ byte_t bigint::get_digit(cell_t index) const {
 byte_t bigint::set_digit(cell_t index, cell_t value) {
     byte_t ret_val = STATUS_OK;
     if (value < 0 || value > 9) return ERROR_INVALID_DIGIT;
-    else if (index >= (cells->size() * DIGITS_PER_CELL)) { // If exceeds bounds, create new cell and add digit to it
-
-        cells->push_back(value);
+    if (index >= (cells->size() * DIGITS_PER_CELL)) { // If exceeds bounds, create new cell and add digit to it
+        ret_val = STATUS_NEW_CELL_CREATED;
+        while (index >= (cells->size() * DIGITS_PER_CELL)) {
+            cells->push_back(0);
+        }
         std::cout << "New cell created" << std::endl;
     }
-    else {
-        std::cout << "Adding digit " << value << " at index " << index << std::endl;
-        cell_t cellNum = index / DIGITS_PER_CELL;
-        cell_t digitShift = (index % DIGITS_PER_CELL) * DIGIT_BIT_SIZE;
-        cell_t bitmask = 0xf;
-        bitmask = bitmask << digitShift;
-        bitmask = ~bitmask; // Not it so that we can clear the current bit spot
-        cell_t digit = cells->at(cellNum) & bitmask;
-        bitmask = ~bitmask;
-        digit = digit | (value << digitShift);
-        *(cells->begin() + cellNum) = digit;
-    }
-    if (index > m_maxSetIndex) m_maxSetIndex = index;
+    
+    std::cout << "Adding digit " << value << " at index " << index << std::endl;
+    cell_t cellNum = index / DIGITS_PER_CELL;
+    cell_t digitShift = (index % DIGITS_PER_CELL) * DIGIT_BIT_SIZE;
+    cell_t bitmask = 0xf;
+    bitmask = bitmask << digitShift;
+    bitmask = ~bitmask; // Not it so that we can clear the current bit spot
+    cell_t digit = cells->at(cellNum) & bitmask;
+    bitmask = ~bitmask;
+    digit = digit | (value << digitShift);
+    *(cells->begin() + cellNum) = digit;
+    
+    if (index > m_maxSetIndex && get_digit(index) != 0) m_maxSetIndex = index;
     return ret_val;
 }
 
@@ -99,7 +101,14 @@ byte_t bigint::from_string(std::string str) {
     std::cout << std::endl;
     return STATUS_OK;
 }
-
+byte_t bigint::shift_digits(long amount) {
+    bigint bint;
+    for (cell_t i = 0; i < m_maxSetIndex; i++) {
+        if (i + amount >= 0) {
+            bint.set_digit(i + amount, get_digit(i));
+        }
+    }
+}
 bigint bigint::operator+(bigint const &other) const {
     bigint bint;
     cell_t maxIndex = max(m_maxSetIndex, other.m_maxSetIndex);
@@ -114,18 +123,18 @@ bigint bigint::operator+(bigint const &other) const {
         if (m_sign == NEG) digita *= -1;
         if (other.m_sign == NEG) digitb *= -1;
         byte_t result = digita + digitb + carry;
-        if (result < 0) {
+        if (result < 0 && result >= -9) {
             carry = -1;
             bint.set_digit(i, 10 - abs(result));
             bint.m_sign = NEG;
         }
-        // else if (result < -9) {
-        //     carry = -1;
-        //     result += 10;
-        //
-        //     bint.set_digit(i, abs(result));
-        //     bint.m_sign = NEG;
-        // }
+        else if (result < -9) {
+            carry = -1;
+            result += 10;
+            
+            bint.set_digit(i, abs(result));
+            bint.m_sign = NEG;
+        }
         else if (result > 9) {
             carry = 1;
             result -= 10;
@@ -140,7 +149,10 @@ bigint bigint::operator+(bigint const &other) const {
         }
         i++;
     }
-    bint.printDigits();
+    return bint;
+}
+bigint bigint::operator+=(bigint const &other) const {
+    bigint bint = *this + other;
     return bint;
 }
 bigint bigint::operator-(bigint const &other) const {
@@ -153,12 +165,24 @@ bigint bigint::operator*(bigint const &other) const {
     bigint bint(0);
     byte_t digita, digitb;
     cell_t itera = 0, iterb = 0;
-
-    while (itera < m_maxSetIndex) {
-        while (iterb < other.m_maxSetIndex) {
-            
-        }
+    if ((m_sign == NEG && other.m_sign == NEG) || (m_sign == POS && other.m_sign == POS)) {
+        bint.m_sign = POS;
     }
+    else {
+        bint.m_sign = NEG;
+    }
+    // while (itera < m_maxSetIndex) {
+    //     while (iterb < other.m_maxSetIndex) {
+    //         digita = get_digit(itera);
+    //         digitb = other.get_digit(iterb);
+    //         bigint temp(0);
+
+    //     }
+    // }
+    // Mult by repeated addition
+}
+bigint bigint::operator==(bigint const &other) const {
+    
 }
 bigint bigint::operator=(bigint const &other) const {
     bigint bint;

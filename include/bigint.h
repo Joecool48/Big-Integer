@@ -37,11 +37,14 @@ public:
     bigint operator /(bigint const &other) const;
     bigint operator %(bigint const &other) const;
     bigint operator =(bigint const &other) const;
+    bigint operator +=(bigint const &other) const;
+    bigint operator ==(bigint const &other) const;
     byte_t get_digit(cell_t index) const;
     byte_t set_digit(cell_t index, cell_t value);
     void printDigits() const;
 
     byte_t from_string(std::string str);
+    byte_t shift_digits(long amount);
 };
 inline cell_t max(cell_t a, cell_t b) {
     if (a > b) return a;

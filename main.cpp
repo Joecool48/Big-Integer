@@ -5,9 +5,10 @@ int main () {
     //bint2.from_string("500");
     //bigint bint;
     //bint = bint1 + bint2;
-    long i = 1234567899999999999;
+    long i = 30;
+    long i2 = -29;
     bigint bint1(i);
-    bigint bint2(i);
+    bigint bint2(i2);
     bigint bint = bint1 + bint2;
     bint.printDigits();
 }
