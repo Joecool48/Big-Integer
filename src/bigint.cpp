@@ -6,7 +6,25 @@ bigint::bigint() {
     m_sign = POS;
     m_maxSetIndex = 0;
 }
-
+bigint::bigint(long value) {
+    cells = new std::vector<cell_t>();
+    if (value == 0) cells->push_back(0);
+    //cells->push_back(value % 10);
+    byte_t index = 0;
+    m_sign = POS;
+    if (value < 0) {
+        m_sign = NEG;
+        value *= -1;
+    }
+    while (value > 0) {
+        std::cout << (int) value << std::endl;
+        set_digit(index, value % 10);
+        value /= 10;
+        index++;
+    }
+    if (index > 0) index -= 1;
+    m_maxSetIndex = index;
+}
 byte_t bigint::get_digit(cell_t index) const {
     if (index >= cells->size() * DIGITS_PER_CELL) { // If out of bounds return error
         return ERROR_OUT_OF_BOUNDS;
@@ -20,7 +38,7 @@ byte_t bigint::get_digit(cell_t index) const {
 }
 
 byte_t bigint::set_digit(cell_t index, cell_t value) {
-    cell_t ret_val = STATUS_OK;
+    byte_t ret_val = STATUS_OK;
     if (value < 0 || value > 9) return ERROR_INVALID_DIGIT;
     else if (index >= (cells->size() * DIGITS_PER_CELL)) { // If exceeds bounds, create new cell and add digit to it
 
@@ -45,6 +63,7 @@ byte_t bigint::set_digit(cell_t index, cell_t value) {
 
 void bigint::printDigits() const {
     byte_t digit;
+    std::cout << "Max = " << m_maxSetIndex << std::endl;
     cell_t index = m_maxSetIndex;
     if (m_sign == NEG) {
         std::cout << "-";
@@ -131,12 +150,13 @@ bigint bigint::operator-(bigint const &other) const {
     return (bint + *this);
 }
 bigint bigint::operator*(bigint const &other) const {
-    bigint bint;
+    bigint bint(0);
     byte_t digita, digitb;
     cell_t itera = 0, iterb = 0;
 
     while (itera < m_maxSetIndex) {
         while (iterb < other.m_maxSetIndex) {
+            
         }
     }
 }

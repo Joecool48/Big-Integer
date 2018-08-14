@@ -29,6 +29,7 @@ public:
     const static int DIGITS_PER_CELL = 16;
     cell_t m_maxSetIndex;
     bigint();
+    //bigint(byte_t value);
     bigint(long value);
     bigint operator +(bigint const &other) const;
     bigint operator -(bigint const &other) const;
