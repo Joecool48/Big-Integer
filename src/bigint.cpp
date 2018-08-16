@@ -81,7 +81,8 @@ void bigint::printDigits() const {
 
 byte_t bigint::from_string(std::string str) {
     if (str.empty()) return ERROR_INVALID_DIGIT;
-    std::cout << str.size() << std::endl;
+    // Clear the array
+    cells->clear();
     m_sign = POS;
     cell_t end = 0;
     cell_t place = 0;
@@ -98,9 +99,11 @@ byte_t bigint::from_string(std::string str) {
             set_digit(place, str[i] - '0');
         }
     }
-    std::cout << std::endl;
+    m_maxSetIndex = str.size();
+    //std::cout << std::endl;
     return STATUS_OK;
 }
+// Under construction
 byte_t bigint::shift_digits(long amount) {
     bigint bint;
     for (cell_t i = 0; i < m_maxSetIndex; i++) {
@@ -109,6 +112,8 @@ byte_t bigint::shift_digits(long amount) {
         }
     }
 }
+// Fails to work when a positive and negative add to a negative.
+// Otherwise it works fine.
 bigint bigint::operator+(bigint const &other) const {
     bigint bint;
     cell_t maxIndex = max(m_maxSetIndex, other.m_maxSetIndex);
@@ -181,14 +186,74 @@ bigint bigint::operator*(bigint const &other) const {
     // }
     // Mult by repeated addition
 }
-bigint bigint::operator==(bigint const &other) const {
-    
+
+bool operator==(bigint const &bint1, bigint const &bint2) {
+    cell_t index = 0;
+    byte_t digita, digitb;
+    if (bint1.m_maxSetIndex != bint2.m_maxSetIndex) return false;
+    if (bint1.m_sign != bint2.m_sign) return false;
+    while (index < bint1.m_maxSetIndex) {
+        digita = bint1.get_digit(index);
+        digitb = bint2.get_digit(index);
+        index++;
+        if (digita != digitb) return false;
+    }
+    return true;
 }
-bigint bigint::operator=(bigint const &other) const {
+bool operator!=(bigint const &bint1, bigint const &bint2) {
+    return !(bint1 == bint2);
+}
+bool operator>(bigint const &bint1, bigint const &bint2) {
+    cell_t index = 0;
+    byte_t digita, digitb;
+    if (bint1.m_sign == bigint::POS && bint2.m_sign == bigint::NEG) return true;
+    if (bint1.m_sign == bigint::NEG && bint2.m_sign == bigint::POS) return false;
+    if (bint1.m_maxSetIndex > bint2.m_maxSetIndex) return true;
+    else if (bint1.m_maxSetIndex < bint2.m_maxSetIndex) return false;
+    else {
+        while (index < bint1.m_maxSetIndex) {
+            if (digita < digitb) return false;
+            index++;
+        }
+    }
+    return true; 
+}
+bool operator<(bigint const &bint1, bigint const &bint2) {
+    return bint2 > bint1;
+}
+bool operator<=(bigint const &bint1, bigint const &bint2) {
+    return ((bint1 < bint2) || (bint1 == bint2)); 
+}
+bool operator>=(bigint const &bint1, bigint const &bint2) {
+    return ((bint1 > bint2) || bint1 == bint2);
+}
+std::ostream& operator<<(std::ostream& out, bigint const &bint) {
+    byte_t digit;
+    cell_t index = bint.m_maxSetIndex;
+    if (bint.m_sign == bigint::NEG) {
+        out << "-";
+    }
+    while (index >= 0) {
+        digit = bint.get_digit(index);
+        out << (int) digit;
+        if (index == 0) break;
+        index--;
+    }
+    return out;
+}
+// Doesnt print the right amount of digits (prints leading zeros)
+std::istream& operator>>(std::istream& in, bigint &bint) {
+    std::string str;
+    in >> str;
+    bint.from_string(str);
+    return in;
+}
+// = operator is broken currently
+void bigint::operator=(bigint const &other) const {
     bigint bint;
     for (cell_t i = 0; i < other.cells->size(); i++) {
         bint.cells->push_back(other.cells->at(i));
     }
     bint.m_sign = other.m_sign;
-    return bint;
+    *this = bint;
 }
