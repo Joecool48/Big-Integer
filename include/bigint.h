@@ -37,7 +37,7 @@ public:
     bigint operator *(bigint const &other) const;
     bigint operator /(bigint const &other) const;
     bigint operator %(bigint const &other) const;
-    void operator =(bigint const &other) const;
+    bigint operator =(bigint const &other);
     bigint operator +=(bigint const &other) const;
     bigint operator -=(bigint const &other) const;
     bigint operator *=(bigint const &other) const;

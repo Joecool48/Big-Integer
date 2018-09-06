@@ -47,7 +47,7 @@ byte_t bigint::set_digit(cell_t index, cell_t value) {
         }
         std::cout << "New cell created" << std::endl;
     }
-    
+
     std::cout << "Adding digit " << value << " at index " << index << std::endl;
     cell_t cellNum = index / DIGITS_PER_CELL;
     cell_t digitShift = (index % DIGITS_PER_CELL) * DIGIT_BIT_SIZE;
@@ -58,7 +58,7 @@ byte_t bigint::set_digit(cell_t index, cell_t value) {
     bitmask = ~bitmask;
     digit = digit | (value << digitShift);
     *(cells->begin() + cellNum) = digit;
-    
+
     if (index > m_maxSetIndex && get_digit(index) != 0) m_maxSetIndex = index;
     return ret_val;
 }
@@ -136,7 +136,7 @@ bigint bigint::operator+(bigint const &other) const {
         else if (result < -9) {
             carry = -1;
             result += 10;
-            
+
             bint.set_digit(i, abs(result));
             bint.m_sign = NEG;
         }
@@ -167,14 +167,22 @@ bigint bigint::operator-(bigint const &other) const {
     return (bint + *this);
 }
 bigint bigint::operator*(bigint const &other) const {
-    bigint bint(0);
     byte_t digita, digitb;
-    cell_t itera = 0, iterb = 0;
     if ((m_sign == NEG && other.m_sign == NEG) || (m_sign == POS && other.m_sign == POS)) {
         bint.m_sign = POS;
     }
     else {
         bint.m_sign = NEG;
+    }
+    cell_t num1_index = 0, num2_index = 0;
+    bigint result(0);
+    while (num1_index < m_maxSetIndex) {
+        num2_index = 0;
+        while (num2_index < other.m_maxSetIndex) {
+            
+            num2_index++;
+        }
+        num1_index++;
     }
     // while (itera < m_maxSetIndex) {
     //     while (iterb < other.m_maxSetIndex) {
@@ -216,13 +224,13 @@ bool operator>(bigint const &bint1, bigint const &bint2) {
             index++;
         }
     }
-    return true; 
+    return true;
 }
 bool operator<(bigint const &bint1, bigint const &bint2) {
     return bint2 > bint1;
 }
 bool operator<=(bigint const &bint1, bigint const &bint2) {
-    return ((bint1 < bint2) || (bint1 == bint2)); 
+    return ((bint1 < bint2) || (bint1 == bint2));
 }
 bool operator>=(bigint const &bint1, bigint const &bint2) {
     return ((bint1 > bint2) || bint1 == bint2);
@@ -249,11 +257,13 @@ std::istream& operator>>(std::istream& in, bigint &bint) {
     return in;
 }
 // = operator is broken currently
-void bigint::operator=(bigint const &other) const {
-    bigint bint;
+bigint bigint::operator=(bigint const &other) {
+    if (this == &other) return *this;
+    this->cells->clear();
     for (cell_t i = 0; i < other.cells->size(); i++) {
-        bint.cells->push_back(other.cells->at(i));
+        this->cells->push_back(other.cells->at(i));
     }
-    bint.m_sign = other.m_sign;
-    *this = bint;
+    this->m_sign = other.m_sign;
+    this->m_maxSetIndex = other.m_maxSetIndex;
+    return *this;
 }
